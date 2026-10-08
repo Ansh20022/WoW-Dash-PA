@@ -1,4 +1,4 @@
-modules = ["nodejs-24"]
+modules = ["nodejs-24", "python-base-3.13", "postgresql-16"]
 
 [deployment]
 router = "application"
@@ -18,3 +18,13 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[nix]
+channel = "stable-25_05"
+packages = ["glibcLocales"]
+
+[userenv]
+
+[userenv.shared]
+SHAREPOINT_FOLDER_URL = "https://onemsci.sharepoint.com/:f:/s/PrivateAssets-Financeteam/IgBRV_hl74TKRqp0RzMUaeqZAcxfrUr1ESOX3ZaltA9-Gg4?e=1rD8E6"
+DASHBOARD_ADMIN_USER_ID = "54692971"

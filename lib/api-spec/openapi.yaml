@@ -11,6 +11,118 @@ tags:
   - name: health
     description: Health operations
 paths:
+  /login:
+    get:
+      operationId: beginBrowserLogin
+      parameters:
+        - name: returnTo
+          in: query
+          schema: { type: string }
+      responses:
+        "302": { description: Redirect to the identity provider }
+  /callback:
+    get:
+      operationId: handleBrowserLoginCallback
+      responses:
+        "302": { description: Complete sign-in and return to app }
+  /logout:
+    get:
+      operationId: logoutBrowserSession
+      parameters:
+        - name: returnTo
+          in: query
+          schema: { type: string }
+      responses:
+        "302": { description: Clear session and sign out }
+  /auth/user:
+    get:
+      operationId: getCurrentAuthUser
+      responses:
+        "200":
+          description: Current identity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUserEnvelope"
+  /dashboard/access:
+    get:
+      operationId: getDashboardAccess
+      responses:
+        "200":
+          description: Invitation authorization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessStatus"
+  /dashboard/status:
+    get:
+      operationId: getDashboardStatus
+      responses:
+        "200":
+          description: Data provenance and refresh status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStatus"
+  /dashboard/refresh:
+    post:
+      operationId: refreshDashboard
+      responses:
+        "200":
+          description: Refresh completed or failed with last good data retained
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStatus"
+  /dashboard/report:
+    get:
+      operationId: getDashboardReport
+      responses:
+        "200":
+          description: Authorized interactive report
+          content:
+            text/html:
+              schema:
+                type: string
+  /dashboard/invitations:
+    get:
+      operationId: listInvitations
+      responses:
+        "200":
+          description: Authorized colleagues
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Invitation"
+    post:
+      operationId: createInvitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvitationInput"
+      responses:
+        "201":
+          description: Access granted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invitation"
+  /dashboard/invitations/{userId}:
+    delete:
+      operationId: revokeInvitation
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Access revoked
   /healthz:
     get:
       operationId: healthCheck
@@ -26,6 +138,69 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    AuthUser:
+      type: object
+      required: [id, email, firstName, lastName, profileImageUrl]
+      properties:
+        id: { type: string }
+        email: { type: [string, "null"] }
+        firstName: { type: [string, "null"] }
+        lastName: { type: [string, "null"] }
+        profileImageUrl: { type: [string, "null"] }
+    AuthUserEnvelope:
+      type: object
+      required: [user]
+      properties:
+        user:
+          oneOf:
+            - $ref: "#/components/schemas/AuthUser"
+            - type: "null"
+    AccessStatus:
+      type: object
+      required: [authorized, isAdmin, adminConfigured]
+      properties:
+        authorized: { type: boolean }
+        isAdmin: { type: boolean }
+        adminConfigured: { type: boolean }
+    InvitationInput:
+      type: object
+      required: [userId, label]
+      properties:
+        userId: { type: string, minLength: 1, maxLength: 100 }
+        label: { type: string, minLength: 1, maxLength: 150 }
+    Invitation:
+      type: object
+      required: [userId, label, createdAt]
+      properties:
+        userId: { type: string }
+        label: { type: string }
+        createdAt: { type: string }
+    SourceFile:
+      type: object
+      required: [name, size]
+      properties:
+        name: { type: string }
+        size: { type: integer }
+    DashboardStatus:
+      type: object
+      required: [source, snapshotDate, quarter, lastAttempt, lastSuccess, error, validation, warnings, files, version, refreshing]
+      properties:
+        source: { type: string, enum: [uploaded_snapshot, sharepoint] }
+        snapshotDate: { type: string }
+        quarter: { type: string }
+        lastAttempt: { type: [string, "null"] }
+        lastSuccess: { type: [string, "null"] }
+        error: { type: [string, "null"] }
+        validation: { type: string }
+        warnings:
+          type: array
+          items: { type: string }
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/SourceFile"
+        version: { type: string }
+        refreshing: { type: boolean }
     HealthStatus:
       type: object
       properties:

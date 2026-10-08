@@ -1,1 +1,1 @@
-- [Dashboard scope and access](dashboard-scope.md) — preserve supplied PA WoW logic; access is invitation-only.
+- [Dashboard scope and access](dashboard-scope.md) — latest extracts; October 5 snapshot still reports Q3-26; preserve PA WoW logic and invitation-only access.

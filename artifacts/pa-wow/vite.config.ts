@@ -71,6 +71,8 @@ export default defineConfig({
     allowedHosts: true,
     fs: {
       strict: true,
+      // Workspace auto-discovery must never expose private finance source files.
+      deny: ['.env', '.env.*', '*.{crt,pem}', '**/.git/**', '**/.local/**', '**/api-server/**', '**/attached_assets/**', '**/.pythonlibs/**'],
     },
   },
   preview: {

@@ -1,0 +1,70 @@
+{
+ "Q3-26": {
+  "Private Capital Solutions|Americas": {
+   "q4New": 3975496,
+   "q4Can": -1247423,
+   "q4OT": 337086,
+   "tNew": 5886409,
+   "tCan": -1383308,
+   "tOT": 384000,
+   "tNN": 4503102,
+   "tTNN": 4887102,
+   "gT": 6270409
+  },
+  "Private Capital Solutions|APAC": {
+   "q4New": 425801,
+   "q4Can": -24065,
+   "q4OT": 85205,
+   "tNew": 1155578,
+   "tCan": -72750,
+   "tOT": 141873,
+   "tNN": 1082828,
+   "tTNN": 1224701,
+   "gT": 1297451
+  },
+  "Private Capital Solutions|EMEA": {
+   "q4New": 1586994,
+   "q4Can": -360632,
+   "q4OT": 225361,
+   "tNew": 2379332,
+   "tCan": -347564,
+   "tOT": 163506,
+   "tNN": 2031767,
+   "tTNN": 2195273,
+   "gT": 2542837
+  },
+  "Real Assets|Americas": {
+   "q4New": 1781707,
+   "q4Can": -932727,
+   "q4OT": 127500,
+   "tNew": 2292160,
+   "tCan": -927597,
+   "tOT": 80527,
+   "tNN": 1364564,
+   "tTNN": 1445091,
+   "gT": 2372688
+  },
+  "Real Assets|APAC": {
+   "q4New": 529445,
+   "q4Can": -216404,
+   "q4OT": 38000,
+   "tNew": 786660,
+   "tCan": -334350,
+   "tOT": 156000,
+   "tNN": 452310,
+   "tTNN": 608310,
+   "gT": 942660
+  },
+  "Real Assets|EMEA": {
+   "q4New": 1392883,
+   "q4Can": -1676748,
+   "q4OT": 125356,
+   "tNew": 2247687,
+   "tCan": -1688403,
+   "tOT": 198000,
+   "tNN": 559284,
+   "tTNN": 757284,
+   "gT": 2445687
+  }
+ }
+}

@@ -61,6 +61,7 @@ export default defineConfig({
     allowedHosts: true,
     fs: {
       strict: true,
+      deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "**/.local/**", "**/api-server/**", "**/attached_assets/**", "**/.pythonlibs/**"],
     },
   },
   preview: {

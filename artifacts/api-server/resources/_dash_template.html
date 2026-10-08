@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PA WoW Dashboard</title>
+<style>
+:root{--navy:#10205b;--royal:#2b46c4;--soft:#e8ecfb;--ink:#1c2331;--muted:#6b7280;--line:#e3e7ef;--bg:#f4f6fb;--pos:#1f8a5b;--pos-bg:#e6f4ec;--neg:#c0392b;--amber:#e0a800;--teal:#2bb0a3;--pink:#c0396b;--orange:#e8871e}
+*{box-sizing:border-box}body{margin:0;font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:13px}
+.wrap{max-width:1500px;margin:0 auto;padding:14px 18px 60px}
+.topbar{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;border-radius:10px;padding:12px 18px;gap:12px}
+.topbar h1{font-size:18px;margin:0;font-weight:600}.topbar .sub{font-size:11px;opacity:.8;margin-top:2px}
+.weeks{display:flex;gap:10px;align-items:center}
+.weekbox{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:6px 14px;text-align:center;line-height:1.25}
+.weekbox b{display:block;font-size:14px}.weekbox span{font-size:10px;opacity:.85;text-transform:uppercase;letter-spacing:.5px}
+.expbtn{background:#fff;color:var(--navy);border:none;border-radius:8px;padding:9px 14px;font-weight:700;font-size:12px;cursor:pointer}
+.pagetabs{display:flex;gap:6px;margin:12px 0 8px;flex-wrap:wrap}
+.pagetab{padding:9px 18px;border-radius:8px 8px 0 0;background:#dbe1ee;color:#3a4256;font-weight:600;font-size:12px;cursor:pointer}
+.pagetab.active{background:var(--royal);color:#fff}
+.controls{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:0 0 14px}
+.ctl{display:flex;flex-direction:column;gap:4px}.ctl label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}
+.ctl select{padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:12px;min-width:150px;color:var(--ink)}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;width:max-content}
+.seg div{padding:8px 20px;background:#fff;cursor:pointer;font-weight:600;color:#55607a;font-size:12px;border-right:1px solid var(--line)}.seg div:last-child{border-right:none}.seg div.active{background:var(--navy);color:#fff}
+.note{margin-left:auto;font-size:11px;color:var(--muted);font-style:italic;align-self:center;max-width:420px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px;border-top:3px solid var(--royal)}
+.kpi .lab{font-size:11px;color:var(--muted);font-weight:600;min-height:30px;line-height:1.3}.kpi .val{font-size:22px;font-weight:700;margin:6px 0 2px}.kpi .meta{font-size:11px;color:var(--muted)}
+.kpi.k-l1{border-top-color:var(--navy)}.kpi.k-l2{border-top-color:var(--neg)}.kpi.k-l3{border-top-color:var(--neg)}.kpi.k-l4{border-top-color:var(--royal)}.kpi.k-l5{border-top-color:var(--pos)}.kpi.k-l6{border-top-color:var(--pos)}.kpi.k-l7{border-top-color:var(--teal)}
+.pos{color:var(--pos)}.neg{color:var(--neg)}
+.panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}.panel h3{margin:0 0 3px;font-size:14px}.panel .desc{font-size:11px;color:var(--muted);margin:0 0 12px}
+table.mx{border-collapse:collapse;width:100%;font-size:12px}table.mx th{background:var(--navy);color:#fff;padding:8px 9px;text-align:right;font-weight:600;font-size:11px}table.mx th.l,table.mx td.l{text-align:left}
+table.mx td{padding:7px 9px;text-align:right;border:1px solid #eef1f7;font-variant-numeric:tabular-nums}table.mx td.l{font-weight:600;background:#f7f9fd}
+table.mx tr.tot td{font-weight:700;background:#eef1fb;border-top:2px solid var(--navy)}
+.blk td{border-top:3px solid var(--navy)}   /* starts a new block on the Global page */
+.hide{display:none}.callout{font-size:11px;background:var(--soft);border:1px solid #cdd6f5;color:#2c3a72;border-radius:8px;padding:8px 12px;margin-top:10px}
+.err{background:#fbeae8;border:1px solid #e6b0a8;color:#8a2a1a;padding:14px;border-radius:10px}
+.execblock{margin-bottom:16px}
+.execlab{font-weight:700;font-size:13px;color:#fff;background:var(--navy);margin:0 0 8px;padding:5px 12px;border-radius:6px;display:inline-block;letter-spacing:.3px}
+.execgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.execcard{background:#fff;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.ecap{color:#fff;padding:6px 9px;font-weight:700;font-size:11.5px;line-height:1.15}
+.edelta{display:flex;justify-content:space-around;gap:3px;font-size:9.5px;color:#55607a;padding:4px 3px;background:#f4f6fb;border-bottom:1px solid var(--line)}
+.ebar{padding:6px 4px 2px}
+@media(max-width:1100px){.execgrid{grid-template-columns:repeat(2,1fr)}}
+#execTables .panel{padding:0;margin:0 0 16px;overflow:auto}
+#execTables .mcap{color:#fff;padding:8px 12px;font-weight:700;font-size:13px}
+#execTables table.mx{table-layout:fixed;width:100%}
+#execTables table.mx td,#execTables table.mx th{padding:5px 8px;text-align:center;overflow:hidden;text-overflow:ellipsis}
+#execTables table.mx td.l,#execTables table.mx th.l{text-align:left;width:160px}
+#execTables tr.sp td{height:5px;padding:0;background:#fff;border-left-color:#fff;border-right-color:#fff}
+</style></head>
+<body><div class="wrap">
+<div class="topbar">
+ <div><h1>Private Assets — Week-over-Week</h1><div class="sub">Q3-26</div></div>
+ <div class="weeks">
+  <div class="weekbox" style="text-align:left"><span>Compare to</span><select id="blSel" onchange="setBL(this.value)" style="display:block;margin-top:3px;background:#fff;color:#10205b;border:none;border-radius:5px;padding:3px 6px;font-size:12.5px;font-weight:700;max-width:200px"></select></div><div class="weekbox"><span>Prior</span><b id="pwDate">—</b></div>
+  <div class="weekbox"><span>Current Week</span><b id="cwDate">—</b></div>
+  <button class="expbtn" id="expBtn" title="Download the computed data">⬇ Export CSV</button>
+ </div></div>
+<div class="pagetabs">
+ <div class="pagetab active" data-p="exec">Exec Summary</div><div class="pagetab" data-p="summary">Summary</div><div class="pagetab" data-p="global">Global</div>
+ <div class="pagetab" data-p="wow">WoW Change</div><div class="pagetab" data-p="logic">Rec. Sales WoW Analysis</div></div>
+<div class="controls" id="mainControls">
+ <div class="ctl"><label>Segment</label><div class="seg" id="segSeg"><div data-s="ALL" class="active">All PA</div><div data-s="Real Assets">Real Assets</div><div data-s="Private Capital Solutions">PCS</div></div></div>
+ <div class="ctl" id="regCtl"><label>Region</label><select id="regSel"><option value="ALL">All regions</option><option>Americas</option><option>APAC</option><option>EMEA</option></select></div>
+ <div class="note" id="ctlNote">Computed from the weekly extract files.</div></div>
+<div id="root"></div>
+<!-- EXEC --><div id="page-exec">
+ <div id="execTables"></div></div>
+<!-- SUMMARY --><div id="page-summary" class="hide">
+ <p class="desc" style="margin:0 0 10px"><b>Q3-26.</b> Bars: Current / Prior / Q3-25 / Target ($M). Forecast = Actual + open pipeline (Closed/Commit); Cancels = Actual + all cancel pipeline. Filter-driven.</p>
+ <div id="sumCharts" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px"></div>
+ <div id="sumTables" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div></div>
+<!-- GLOBAL --><div id="page-global" class="hide">
+ <div class="panel"><h3>WoW Pipeline Movement (excl. CAM Placeholders) — Recurring Sales, Q3-26</h3>
+ <p class="desc">One column per weekly snapshot in /extracts (Q3-26), oldest to latest. Recurring sales only (New Actual &amp; New open pipeline), excl. CAM placeholders. Add weekly files to extend the columns.</p>
+ <div style="overflow:auto"><table class="mx" id="globalTbl"></table></div>
+ <div class="callout"><b>Advanced = Contract, Renewal, Pending Renewal, PPR</b>. Quarter Target = recurring New Sales target (EDWH #SF).</div>
+ <div style="margin-top:16px"><h3 style="margin:0 0 3px;font-size:14px">Q3-26 Sales Forecast trend</h3><p class="desc" style="margin:0 0 10px">Total Forecast (QTD Actual + Commit pipeline + CAM Placeholder pipeline), by region, one bar per weekly snapshot. The latest week splits CAM out as its own segment instead of folding it into a region.</p><div id="salesTrendChart"></div></div>
+ <div style="margin-top:16px"><h3 style="margin:0 0 3px;font-size:14px">Q3-26 Cancels Forecast trend</h3><p class="desc" style="margin:0 0 10px">Cancel Actual + Cancels Open Opportunities (no forecast-category filter), by region, one bar per weekly snapshot. The latest week splits CAM out as its own segment.</p><div id="cancelsTrendChart"></div></div>
+ </div></div>
+<!-- WOW --><div id="page-wow" class="hide">
+ <p class="desc" style="margin:0 0 10px">Account variance (Current − Prior forecast, Closed+Commit) filtered to &gt; $5K / &lt; −$5K. Filter-driven.</p>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start"><div id="wowRec"></div><div style="display:grid;gap:14px"><div id="wowCan"></div><div id="wowOT"></div></div></div></div>
+<!-- LOGIC --><div id="page-logic" class="hide">
+ <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Region view</span><div id="logicRegBtns" style="display:flex;gap:6px"></div><span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-left:14px">Forecast category</span><div id="fcBtns" style="display:flex;gap:6px"></div><button id="camBtn" onclick="toggleCAM()" style="margin-left:14px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);cursor:pointer;font-weight:700;font-size:12px;background:#fff;color:#55607a">Exclude CAM placeholders</button><span id="camNote" style="font-size:11px;color:var(--muted)"></span></div>
+ <p class="desc" style="margin:-4px 0 10px">Q3‑26 pipeline bridge, Prior → Current week. The six logics are the middle bars of the waterfall and sum Opening → Closing pipeline. New Wins (L7) is a separate booked metric (no prior pipeline).</p>
+ <div class="kpis" id="logicKpis"></div>
+ <div class="panel"><h3>Open-pipeline bridge · Q3-26 · Prior → Current</h3><p class="desc">Q3-26 open pipeline, Prior week → Current week. Every deal sits in exactly one bar, so the bars reconcile exactly from Prior open to Current open. <b>Disqualified / Dropped (L2)</b> = Q3 pipeline that slipped to a later quarter; <b>Pushed / Pulled In (L6)</b> = pipeline that moved into Q3 from another quarter. <b>Converted (L1)</b> = Q3 open pipeline that closed this week (won or lost). Each bar equals its detail-table total.</p><div id="wfChart"></div></div>
+ <div class="panel"><h3>Sub Product breakdown (Q3-26 bridge)</h3><p class="desc">Same bridge, opening to closing pipeline, split by Sub Product New. Respects Segment / Region / Compare-to / Exclude-CAM / Forecast-category filters — collapses across Region when "All PA" regions is selected.</p><table class="mx" id="spTbl"></table></div>
+ <div class="panel"><h3>The logics — summary (Q3-26 bridge)</h3><p class="desc">Totals for the current Segment / Region filter.</p><table class="mx" id="logicTbl"></table></div>
+ <div class="panel"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div><h3>The logics — line-item detail</h3><p class="desc">Each logic ties to its waterfall bar. Respects Segment / Region. Movement tab has a forecast-category-move filter.</p></div><button onclick="exportLogics()" style="background:var(--navy);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap">⬇ Export all logics (Excel)</button></div>
+ <div id="logicTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div><div id="logicDrill" style="max-height:470px;overflow:auto"></div></div></div></div>
+__WOWDATA__
+<script>
+if(typeof WOW_DATA==="undefined"){document.getElementById("root").innerHTML='<div class="err"><b>Data failed to load.</b></div>';}
+else{
+const WD=WOW_DATA;let BL=(WD.options&&WD.options.length?WD.options[0].key:Object.keys(WD.baselines)[0]);let D=WD.baselines[BL];function renderBlSel(){var el=document.getElementById("blSel");if(!el||!WD.options)return;el.innerHTML=WD.options.map(function(o){return '<option value="'+o.key+'"'+(o.key===BL?' selected':'')+'>'+o.label+' \u00b7 '+o.date+'</option>';}).join("");}function setBL(k){BL=k;D=WD.baselines[k];renderAll();}
+document.getElementById("pwDate").textContent=D.meta.pw;document.getElementById("cwDate").textContent=D.meta.cw;
+/* Targets (Q3-26) & Q3-25 prior-year actuals — from EDWH #SF (refs_edwh.json), embedded at build time */
+const REFS=D.refs||{};
+let SEG="ALL",REG="ALL",LOGICREG="ALL",EXCAM=false,FCSEL="All";
+function L(){return (D.fc&&D.fc[FCSEL])?D.fc[FCSEL]:D.fc.All;}
+function setFC(v){FCSEL=v;renderAll();}
+function renderFCBtns(){var el=document.getElementById("fcBtns");if(!el)return;el.innerHTML=["All","Commit","Best Case","Omitted"].map(function(o){return `<button onclick="setFC('${o}')" style="padding:7px 14px;border-radius:8px;border:1px solid var(--line);cursor:pointer;font-weight:700;font-size:12px;${FCSEL===o?'background:var(--royal);color:#fff':'background:#fff;color:#55607a'}">${o}</button>`;}).join("");}
+const fmtM=v=>{if(v==null||isNaN(v))return"–";const s=v<0?"−":"";const a=Math.abs(v);if(a>=1e6)return s+"$"+(a/1e6).toFixed(2)+"M";if(a>=1e3)return s+"$"+(a/1e3).toFixed(0)+"K";return s+"$"+Math.round(a).toLocaleString();};
+const fmtS=v=>{const s=v>=0?"+":"−";const a=Math.abs(v);if(a>=1e6)return s+"$"+(a/1e6).toFixed(2)+"M";if(a>=1e3)return s+"$"+(a/1e3).toFixed(0)+"K";return s+"$"+Math.round(a);};
+const isSeg=v=>SEG==="ALL"||v===SEG||(SEG==="Real Assets"&&v==="R")||(SEG==="Private Capital Solutions"&&v==="P");
+const isReg=v=>REG==="ALL"||v===REG||(REG==="Americas"&&v==="Am")||(REG==="APAC"&&v==="Ap")||(REG==="EMEA"&&v==="Em");
+const isRegL=v=>LOGICREG==="ALL"||v===LOGICREG||(LOGICREG==="Americas"&&v==="Am")||(LOGICREG==="APAC"&&v==="Ap")||(LOGICREG==="EMEA"&&v==="Em");
+const segLbl=v=>(v==="R"||v==="Real Assets")?"RA":"PCS", regLbl=v=>({Am:"Americas",Ap:"APAC",Em:"EMEA"}[v]||v);
+/* ---------- Rec Sales WoW Analysis (logic) ---------- */
+function logicAgg(){
+ const w=L().WF.filter(r=>isSeg(r[0])&&isRegL(r[1])&&(!EXCAM||r[12]===0));const S=i=>w.reduce((a,r)=>a+r[i],0);
+ const nw=(D.NWINSG||[]).filter(r=>isSeg(r[0])&&isRegL(r[1])&&(!EXCAM||r[3]===0)).reduce((a,r)=>a+r[2],0);
+ return{opening:S(2),conv:S(3),dropped:S(4),lost:S(5),mov:S(6),newp:S(7),pushed:S(8),catin:S(9),catout:S(10),closing:S(11),nwins:nw};}
+function renderLogicRegBtns(){const opts=[["ALL","All PA"],["Americas","Americas"],["APAC","APAC"],["EMEA","EMEA"]];
+ document.getElementById("logicRegBtns").innerHTML=opts.map(o=>`<button onclick="setLogicReg('${o[0]}')" style="padding:7px 16px;border-radius:8px;border:1px solid var(--line);cursor:pointer;font-weight:700;font-size:12px;${LOGICREG===o[0]?'background:var(--navy);color:#fff':'background:#fff;color:#55607a'}">${o[1]}</button>`).join("");}
+function setLogicReg(r){LOGICREG=r;renderAll();}function toggleCAM(){EXCAM=!EXCAM;renderAll();}function renderCamNote(){var b=document.getElementById("camBtn");if(b){b.style.background=EXCAM?"var(--navy)":"#fff";b.style.color=EXCAM?"#fff":"#55607a";b.textContent=(EXCAM?"\u2713 ":"")+"Exclude CAM placeholders";}var n=document.getElementById("camNote");if(!n)return;var ra=L().WF.filter(function(r){return r[0]==="Real Assets"&&isRegL(r[1])&&r[12]===1;}).reduce(function(a,r){return a+r[11];},0);var pcs=L().WF.filter(function(r){return r[0]==="Private Capital Solutions"&&isRegL(r[1])&&r[12]===1;}).reduce(function(a,r){return a+r[11];},0);n.innerHTML=(EXCAM?"CAM excluded":"CAM included")+" \u00b7 current-week pipe held by CAM \u2014 RA "+fmtM(ra)+" \u00b7 PCS "+fmtM(pcs);}
+function renderKpis(){const a=logicAgg();
+ const k=[["k-l1","Pipeline converted to Actual (L1)",a.conv,"pipeline closed / booked"],["k-l2","Pipeline Disqualified / Dropped (L2)",a.dropped,"shifted to a later quarter"],["k-l3","Pipeline Lost in the quarter (L3)",a.lost,"gone from system"],["k-l4","Pipeline movement within the Quarter (L4)",a.mov,"same-quarter $ change"],["k-l5","New Pipeline build for the quarter (L5)",a.newp,"new this quarter"],["k-l6","Pipeline Pushed / Pulled In (L6)",a.pushed,"moved into quarter"]];
+ if(FCSEL!=="All"){k.push(["k-l5","Category In",a.catin,"switched into "+FCSEL]);k.push(["k-l2","Category Out",a.catout,"switched out of "+FCSEL]);}
+ k.push(["k-l7","New Wins (L7)",a.nwins,"booked, no prior pipe"]);
+ document.getElementById("logicKpis").innerHTML=k.map(x=>`<div class="kpi ${x[0]}"><div class="lab">${x[1]}</div><div class="val ${x[2]<0?'neg':'pos'}">${fmtS(x[2])}</div><div class="meta">${x[3]}</div></div>`).join("");}
+function renderLogicTbl(){const a=logicAgg();const cnt=arr=>arr.filter(SRR).length;const Ls=L();const sfx=FCSEL!=="All"?" ("+FCSEL+")":"";
+ const rows=[["Pipeline converted to Actual (L1)",a.conv,cnt(Ls.C)],["Pipeline Disqualified / Dropped (L2)",a.dropped,cnt(Ls.DR)],["Pipeline Lost in the quarter (L3)",a.lost,cnt(Ls.LO)],["Pipeline movement within the Quarter (L4)",a.mov,cnt(Ls.MV)],["New Pipeline build for the quarter (L5)",a.newp,cnt(Ls.NW)],["Pipeline Pushed / Pulled In (L6)",a.pushed,cnt(Ls.PU)]];
+ if(FCSEL!=="All"){rows.push(["Category In · switched into "+FCSEL,a.catin,cnt(Ls.CIN)]);rows.push(["Category Out · switched out of "+FCSEL,a.catout,cnt(Ls.COUT)]);}
+ let h="<thead><tr><th class='l'>Logic</th><th>Pipeline impact (Q3-26)</th><th>#Deals</th></tr></thead><tbody>";
+ h+=`<tr class="tot"><td class="l">Opening Pipeline${sfx}</td><td>${fmtM(a.opening)}</td><td></td></tr>`;
+ h+=rows.map(r=>`<tr><td class='l'>${r[0]}</td><td class="${r[1]<0?'neg':'pos'}">${fmtS(r[1])}</td><td>${r[2]}</td></tr>`).join("");
+ h+=`<tr class="tot"><td class="l">Closing Pipeline${sfx}</td><td>${fmtM(a.closing)}</td><td></td></tr>`;
+ h+=`<tr><td class="l" style="color:#55607a;font-style:italic">New Wins (L7) · separate (booked, no prior pipeline)</td><td class="pos">${fmtS(a.nwins)}</td><td>${cnt(D.NWINS)}</td></tr>`;
+ document.getElementById("logicTbl").innerHTML=h+"</tbody>";}
+function renderSubProd(){
+ // L().SPWF cols (14): seg,region,subprod, opening,conv,drop,lost,mov,new,push,catin,catout,closing, cam
+ const rows=(L().SPWF||[]).filter(r=>isSeg(r[0])&&isRegL(r[1])&&(!EXCAM||r[13]===0));
+ const showCat=FCSEL!=="All";   // mirror the main bridge: Category In/Out only meaningful under a specific forecast category
+ const agg={};
+ rows.forEach(r=>{const k=r[0]+"|"+r[2];if(!agg[k])agg[k]={seg:r[0],sp:r[2],v:[0,0,0,0,0,0,0,0,0,0]};  // opening,conv,drop,lost,mov,new,push,catin,catout,closing
+  const a=agg[k].v;a[0]+=r[3];a[1]+=r[4];a[2]+=r[5];a[3]+=r[6];a[4]+=r[7];a[5]+=r[8];a[6]+=r[9];a[7]+=r[10];a[8]+=r[11];a[9]+=r[12];});
+ const segs=[...new Set(Object.values(agg).map(x=>x.seg))].sort();
+ const segHdr=s=>s==="Private Capital Solutions"?"PCS":s;
+ const cell=v=>`<td class="${v<0?'neg':(v>0?'pos':'')}">${fmtS(v)}</td>`;
+ const heads=["Opening Pipeline","Converted (L1)","Dropped (L2)","Lost (L3)","Movement (L4)","New (L5)","Pushed (L6)"];
+ if(showCat) heads.push("Category In","Category Out");
+ heads.push("Closing Pipeline");
+ const ncol=heads.length+1;
+ let h="<thead><tr><th class='l'>Sub Product</th>"+heads.map(c=>`<th>${c}</th>`).join("")+"</tr></thead><tbody>";
+ if(!segs.length) h+=`<tr><td colspan="${ncol}" class="l" style="color:#9aa3b2;font-style:italic;padding:10px">none in scope</td></tr>`;
+ segs.forEach(seg=>{
+  h+=`<tr class="tot"><td class="l" colspan="${ncol}">${segHdr(seg)}</td></tr>`;
+  const items=Object.values(agg).filter(x=>x.seg===seg).sort((a,b)=>a.sp.localeCompare(b.sp));
+  const tot=[0,0,0,0,0,0,0,0,0,0];
+  const rowHtml=(label,v,cls)=>{let r=`<tr${cls?` class="${cls}"`:''}><td class="l" style="padding-left:22px${cls?'':';font-weight:400;background:#fff'}">${label}</td><td>${fmtM(v[0])}</td>${cell(v[1])}${cell(v[2])}${cell(v[3])}${cell(v[4])}${cell(v[5])}${cell(v[6])}`;
+   if(showCat) r+=`${cell(v[7])}${cell(v[8])}`;
+   return r+`<td>${fmtM(v[9])}</td></tr>`;};
+  items.forEach(it=>{const v=it.v;for(let i=0;i<10;i++)tot[i]+=v[i];h+=rowHtml(it.sp,v);});
+  h+=rowHtml("Total "+segHdr(seg),tot,"tot");
+ });
+ document.getElementById("spTbl").innerHTML=h+"</tbody>";
+}
+let LTAB="conv";function setLogicTab(t){LTAB=t;renderDrill();}
+let MVFC="All";function setMVFC(v){MVFC=v;renderDrill();}
+const SRR=r=>isSeg(r[2])&&isRegL(r[3])&&(!EXCAM||r[r.length-1]===0);
+function renderWaterfall(){const a=logicAgg();
+ const steps=[{l:"Opening Pipeline",v:a.opening,t:1},{l:"Converted to Actual (L1)",v:a.conv},{l:"Disqualified / Dropped (L2)",v:a.dropped},{l:"Lost in quarter (L3)",v:a.lost},{l:"Movement within quarter (L4)",v:a.mov},{l:"New Pipeline build (L5)",v:a.newp},{l:"Pushed / Pulled In (L6)",v:a.pushed}];
+ if(FCSEL!=="All"){steps.push({l:"Category In",v:a.catin});steps.push({l:"Category Out",v:a.catout});}
+ steps.push({l:"Closing Pipeline",v:a.closing,t:1});
+ const W=960,H=356,padT=36,padB=80,padX=14,bw=steps.length>8?66:84;
+ const wrap=(t,m)=>{const w=t.split(" "),ls=[];let c="";w.forEach(x=>{if((c+" "+x).trim().length<=m)c=(c+" "+x).trim();else{if(c)ls.push(c);c=x;}});if(c)ls.push(c);return ls;};
+ let cum=0,mx=0,mn=0;const segs=steps.map(s=>{let st,en;if(s.t){st=0;en=s.v;cum=s.v;}else{st=cum;cum+=s.v;en=cum;}mx=Math.max(mx,st,en);mn=Math.min(mn,st,en);return{...s,st,en};});
+ const rng=(mx-mn)||1,plotH=H-padT-padB,y=v=>padT+plotH*(mx-v)/rng,n=segs.length,gap=(W-2*padX-n*bw)/(n-1);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible"><line x1="${padX}" y1="${y(0).toFixed(1)}" x2="${W-padX}" y2="${y(0).toFixed(1)}" stroke="#d0d6e2"/>`;
+ segs.forEach((g,i)=>{const x=padX+i*(bw+gap),yt=y(Math.max(g.st,g.en)),hh=Math.max(y(Math.min(g.st,g.en))-yt,2),col=g.t?"#10205b":(g.v>=0?"#1f8a5b":"#c0392b");
+  s+=`<rect x="${x}" y="${yt.toFixed(1)}" width="${bw}" height="${hh.toFixed(1)}" fill="${col}" opacity="${g.t?1:.9}" rx="3"/>`;
+  if(i<n-1){const xn=x+bw;s+=`<line x1="${xn}" y1="${y(g.en).toFixed(1)}" x2="${(xn+gap).toFixed(1)}" y2="${y(g.en).toFixed(1)}" stroke="#c3cad8" stroke-dasharray="3 3"/>`;}
+  s+=`<text x="${x+bw/2}" y="${(yt-6).toFixed(1)}" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1c2331">${g.t?fmtM(g.v):fmtS(g.v)}</text>`;
+  const lines=wrap(g.l,15),ly=H-padB+14,cx=x+bw/2;s+=`<text x="${cx}" y="${ly}" font-size="9" font-weight="600" text-anchor="middle" fill="#55607a">`+lines.map((ln,j)=>`<tspan x="${cx}" dy="${j?10:0}">${ln}</tspan>`).join("")+`</text>`;});
+ document.getElementById("wfChart").innerHTML=s+`</svg>`;}
+function renderDrill(){const Ls=L();
+ let defs=[["conv","L1 Converted","Pipeline converted to Actual (L1) · Q3 pipeline that closed (won or lost)"],["dropped","L2 Disqualified / Dropped","Pipeline Disqualified / Dropped (L2) · shifted to a later quarter"],["lost","L3 Lost","Pipeline Lost in the quarter (L3) · gone from the system"],["mov","L4 Movement","Pipeline movement within the Quarter (L4) · same-quarter $ change or forecast-category change (category-only moves are tagged, $0 impact)"],["newp","L5 New","New Pipeline build for the quarter (L5)"],["pushed","L6 Pushed / Pulled In","Pipeline Pushed / Pulled In (L6) · moved into Q3 from another quarter"]];
+ if(FCSEL!=="All"){defs.push(["cin","Category In","Pipeline that switched INTO "+FCSEL+" this week (from another forecast category, still Q3 open)"]);defs.push(["cout","Category Out","Pipeline that switched OUT of "+FCSEL+" this week (to another forecast category, still Q3 open)"]);}
+ defs.push(["nwins","L7 New Wins","New Wins (L7) · booked in Current Week with no prior pipeline"]);
+ if(!defs.find(d=>d[0]===LTAB)) LTAB="conv";
+ document.getElementById("logicTabs").innerHTML=defs.map(d=>`<button onclick="setLogicTab('${d[0]}')" style="padding:7px 14px;border-radius:8px;border:1px solid var(--line);cursor:pointer;font-weight:700;font-size:12px;${LTAB===d[0]?'background:var(--royal);color:#fff':'background:#fff;color:#55607a'}">${d[1]}</button>`).join("");
+ let h='<div style="font-size:12px;color:var(--muted);margin-bottom:6px">'+defs.find(d=>d[0]===LTAB)[2]+' — all rows</div>';
+ const none=n=>`<tr><td colspan="${n}" class="l" style="color:#9aa3b2;font-style:italic;padding:10px">none in scope</td></tr>`;
+ const tbl=(head,body,foot,nc)=>`<table class="mx" style="font-size:11.5px"><thead><tr>${head}</tr></thead><tbody>${body||none(nc)}</tbody><tfoot>${foot}</tfoot></table>`;
+ const c4='<th class="l">Account</th><th class="l">Owner</th><th class="l">Segment</th><th class="l">Region</th>';
+ const b4=r=>`<td class="l">${r[0]}</td><td class="l">${r[1]}</td><td class="l">${segLbl(r[2])}</td><td class="l">${regLbl(r[3])}</td>`;
+ if(LTAB==="conv"){const rw=Ls.C.filter(SRR),t=rw.reduce((a,r)=>a+r[9],0),tp=rw.reduce((a,r)=>a+r[7],0),tc=rw.reduce((a,r)=>a+r[8],0);
+  h+=tbl(c4+'<th class="l">Forecast (Prior Week)</th><th class="l">Qtr</th><th>Prior pipe</th><th>Current Week Actual</th><th>Impact</th>',rw.map(r=>`<tr>${b4(r)}<td class="l">${r[4]}</td><td class="l">${r[5]}</td><td>${fmtM(r[7])}</td><td>${fmtM(r[8])}</td><td class="neg">${fmtS(r[9])}</td></tr>`).join(""),`<tr class="tot"><td class="l" colspan="6">Total (= L1 bar)</td><td>${fmtM(tp)}</td><td>${fmtM(tc)}</td><td>${fmtS(t)}</td></tr>`,9);
+ }else if(LTAB==="dropped"){const rw=Ls.DR.filter(SRR),t=rw.reduce((a,r)=>a+r[8],0),tp=rw.reduce((a,r)=>a+r[7],0);
+  h+=tbl(c4+'<th class="l">Forecast</th><th class="l">From</th><th class="l">Moved to</th><th>Prior pipe</th><th>Impact</th>',rw.map(r=>`<tr>${b4(r)}<td class="l">${r[4]}</td><td class="l">${r[5]}</td><td class="l" style="color:var(--royal);font-weight:700">${r[6]}</td><td>${fmtM(r[7])}</td><td class="neg">${fmtS(r[8])}</td></tr>`).join(""),`<tr class="tot"><td class="l" colspan="7">Total (= L2 bar)</td><td>${fmtM(tp)}</td><td>${fmtS(t)}</td></tr>`,9);
+ }else if(LTAB==="lost"){const rw=Ls.LO.filter(SRR),t=rw.reduce((a,r)=>a+r[7],0),tp=rw.reduce((a,r)=>a+r[6],0);
+  h+=tbl(c4+'<th class="l">Forecast</th><th class="l">Qtr</th><th>Prior pipe</th><th>Impact</th>',rw.map(r=>`<tr>${b4(r)}<td class="l">${r[4]}</td><td class="l">${r[5]}</td><td>${fmtM(r[6])}</td><td class="neg">${fmtS(r[7])}</td></tr>`).join(""),`<tr class="tot"><td class="l" colspan="6">Total (= L3 bar)</td><td>${fmtM(tp)}</td><td>${fmtS(t)}</td></tr>`,8);
+ }else if(LTAB==="mov"){let rw=Ls.MV.filter(SRR);
+  const trans=[...new Set(rw.map(r=>r[4]+" → "+r[5]))].sort();
+  h+=`<div style="margin-bottom:8px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:8px">Forecast category move</label><select onchange="setMVFC(this.value)" style="padding:6px 10px;border:1px solid var(--line);border-radius:7px;font-size:12px;font-weight:600"><option value="All"${MVFC==="All"?" selected":""}>All category moves</option>`+trans.map(x=>`<option value="${x}"${MVFC===x?" selected":""}>${x}</option>`).join("")+`</select></div>`;
+  if(MVFC!=="All") rw=rw.filter(r=>(r[4]+" → "+r[5])===MVFC);
+  const t=rw.reduce((a,r)=>a+r[10],0),tp=rw.reduce((a,r)=>a+r[8],0),tc=rw.reduce((a,r)=>a+r[9],0);
+  h+=tbl(c4+'<th class="l">Forecast Cat. Movement</th><th class="l">Qtr</th><th>Prior pipe</th><th>Current pipe</th><th>&Delta;</th>',rw.map(r=>{var z=r[10]===0;return `<tr${z?' style="background:#f4f6fb"':''}>${b4(r)}<td class="l">${r[4]} → ${r[5]}${z?' <span style="background:#e8ecfb;color:#2c3a72;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:700">category only</span>':''}</td><td class="l">${r[6]}</td><td>${fmtM(r[8])}</td><td>${fmtM(r[9])}</td><td class="${r[10]<0?'neg':(z?'':'pos')}"${z?' style="color:#8a93a6"':''}>${z?'$0':fmtS(r[10])}</td></tr>`;}).join(""),`<tr class="tot"><td class="l" colspan="6">Total (${MVFC==="All"?"= L4 bar":"filtered"})</td><td>${fmtM(tp)}</td><td>${fmtM(tc)}</td><td>${fmtS(t)}</td></tr>`,9);
+ }else if(LTAB==="newp"){const rw=Ls.NW.filter(SRR),t=rw.reduce((a,r)=>a+r[6],0);
+  h+=tbl(c4+'<th class="l">Forecast</th><th class="l">Qtr</th><th>New pipe</th>',rw.map(r=>`<tr>${b4(r)}<td class="l">${r[4]}</td><td class="l">${r[5]}</td><td class="pos">${fmtS(r[6])}</td></tr>`).join(""),`<tr class="tot"><td class="l" colspan="6">Total (= L5 bar)</td><td>${fmtS(t)}</td></tr>`,7);
+ }else if(LTAB==="pushed"){const rw=Ls.PU.filter(SRR),t=rw.reduce((a,r)=>a+r[7],0);
+  h+=tbl(c4+'<th class="l">Forecast</th><th class="l">From Qtr</th><th class="l">To</th><th>Pipe</th>',rw.map(r=>`<tr>${b4(r)}<td class="l">${r[4]}</td><td class="l" style="color:var(--royal);font-weight:700">${r[5]}</td><td class="l">${r[6]}</td><td class="pos">${fmtS(r[7])}</td></tr>`).join(""),`<tr class="tot"><td class="l" colspan="7">Total (= L6 bar)</td><td>${fmtS(t)}</td></tr>`,8);
+ }else if(LTAB==="cin"){const rw=Ls.CIN.filter(SRR),t=rw.reduce((a,r)=>a+r[7],0);
+  h+=tbl(c4+'<th class="l">From cat.</th><th class="l">To cat.</th><th class="l">Qtr</th><th>Pipe in</th>',rw.map(r=>`<tr>${b4(r)}<td class="l">${r[4]}</td><td class="l" style="color:var(--royal);font-weight:700">${r[5]}</td><td class="l">${r[6]}</td><td class="pos">${fmtS(r[7])}</td></tr>`).join(""),`<tr class="tot"><td class="l" colspan="7">Total (= Category In)</td><td>${fmtS(t)}</td></tr>`,8);
+ }else if(LTAB==="cout"){const rw=Ls.COUT.filter(SRR),t=rw.reduce((a,r)=>a+r[8],0),tp=rw.reduce((a,r)=>a+r[7],0);
+  h+=tbl(c4+'<th class="l">From cat.</th><th class="l">To cat.</th><th class="l">Qtr</th><th>Prior pipe</th><th>Impact</th>',rw.map(r=>`<tr>${b4(r)}<td class="l">${r[4]}</td><td class="l" style="color:var(--royal);font-weight:700">${r[5]}</td><td class="l">${r[6]}</td><td>${fmtM(r[7])}</td><td class="neg">${fmtS(r[8])}</td></tr>`).join(""),`<tr class="tot"><td class="l" colspan="7">Total (= Category Out)</td><td>${fmtM(tp)}</td><td>${fmtS(t)}</td></tr>`,9);
+ }else{const rw=D.NWINS.filter(SRR),t=rw.reduce((a,r)=>a+r[6],0);
+  h+=tbl(c4+'<th class="l">Forecast</th><th class="l">Qtr</th><th>Current Week Actual</th>',rw.map(r=>`<tr>${b4(r)}<td class="l">${r[4]}</td><td class="l">${r[5]}</td><td class="pos">${fmtS(r[6])}</td></tr>`).join(""),`<tr class="tot"><td class="l" colspan="6">Total (= L7 New Wins)</td><td>${fmtS(t)}</td></tr>`,7);}
+ document.getElementById("logicDrill").innerHTML=h;}
+function xesc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function exportLogics(){const Ls=L();
+ const sheets=[["L1 Converted",Ls.C.filter(SRR),["Account","Owner","Segment","Region","Forecast (Prior Week)","Prior Qtr","Current Week Qtr","Prior pipe","Current Week Actual","Impact"],r=>[r[0],r[1],segLbl(r[2]),regLbl(r[3]),r[4],r[5],r[6],r[7],r[8],r[9]],[7,8,9]],
+  ["L2 Disqualified Dropped",Ls.DR.filter(SRR),["Account","Owner","Segment","Region","Forecast","From","Moved to","Prior pipe","Impact"],r=>[r[0],r[1],segLbl(r[2]),regLbl(r[3]),r[4],r[5],r[6],r[7],r[8]],[7,8]],
+  ["L3 Lost",Ls.LO.filter(SRR),["Account","Owner","Segment","Region","Forecast","Qtr","Prior pipe","Impact"],r=>[r[0],r[1],segLbl(r[2]),regLbl(r[3]),r[4],r[5],r[6],r[7]],[6,7]],
+  ["L4 Movement",Ls.MV.filter(SRR),["Account","Owner","Segment","Region","Prior Week Forecast","Current Week Forecast","Qtr","Prior pipe","Current pipe","Delta"],r=>[r[0],r[1],segLbl(r[2]),regLbl(r[3]),r[4],r[5],r[6],r[8],r[9],r[10]],[7,8,9]],
+  ["L5 New Pipeline",Ls.NW.filter(SRR),["Account","Owner","Segment","Region","Forecast","Qtr","New pipe"],r=>[r[0],r[1],segLbl(r[2]),regLbl(r[3]),r[4],r[5],r[6]],[6]],
+  ["L6 Pushed Pulled In",Ls.PU.filter(SRR),["Account","Owner","Segment","Region","Forecast","From Qtr","To","Pipe"],r=>[r[0],r[1],segLbl(r[2]),regLbl(r[3]),r[4],r[5],r[6],r[7]],[7]],
+  ["L7 New Wins",D.NWINS.filter(SRR),["Account","Owner","Segment","Region","Forecast","Qtr","Current Week Actual"],r=>[r[0],r[1],segLbl(r[2]),regLbl(r[3]),r[4],r[5],r[6]],[6]]];
+ if(FCSEL!=="All"){sheets.push(["Category In",Ls.CIN.filter(SRR),["Account","Owner","Segment","Region","From cat","To cat","Qtr","Pipe in"],r=>[r[0],r[1],segLbl(r[2]),regLbl(r[3]),r[4],r[5],r[6],r[7]],[7]]);sheets.push(["Category Out",Ls.COUT.filter(SRR),["Account","Owner","Segment","Region","From cat","To cat","Qtr","Prior Pipe","Impact"],r=>[r[0],r[1],segLbl(r[2]),regLbl(r[3]),r[4],r[5],r[6],r[7],r[8]],[7,8]]);}
+ let xml='<?xml version="1.0"?>\n<?mso-application progid="Excel.Sheet"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">';
+ sheets.forEach(function(sh){const name=sh[0],arr=sh[1],cols=sh[2],mp=sh[3],num=sh[4];
+  xml+='<Worksheet ss:Name="'+xesc(name)+'"><Table>';
+  xml+='<Row>'+cols.map(function(c){return '<Cell><Data ss:Type="String">'+xesc(c)+'</Data></Cell>';}).join("")+'</Row>';
+  arr.forEach(function(r){const v=mp(r);xml+='<Row>'+v.map(function(cell,i){const isN=num.indexOf(i)>=0;return '<Cell><Data ss:Type="'+(isN?"Number":"String")+'">'+(isN?cell:xesc(cell))+'</Data></Cell>';}).join("")+'</Row>';});
+  xml+='</Table></Worksheet>';});
+ xml+='</Workbook>';
+ const b=new Blob([xml],{type:"application/vnd.ms-excel"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="PA_WoW_logics_Q3-26.xls";a.click();}
+/* ---------- Summary ---------- */
+function sc(){return scCut(SEG,REG);}
+function scCut(segSel,regSel){
+ const okS=v=>segSel==="ALL"||v===segSel||(segSel==="Real Assets"&&v==="R")||(segSel==="Private Capital Solutions"&&v==="P");
+ const okR=v=>regSel==="ALL"||v===regSel||(regSel==="Americas"&&v==="Am")||(regSel==="APAC"&&v==="Ap")||(regSel==="EMEA"&&v==="Em");
+ const rows=D.summaryComp.filter(r=>okS(r.seg)&&okR(r.region));
+ const cw=f=>rows.reduce((a,r)=>a+f(r),0), ref=f=>rows.reduce((a,r)=>a+(REFS[r.seg+"|"+r.region]?f(REFS[r.seg+"|"+r.region]):0),0);
+ const M=v=>v/1e6;
+ const refsMissing=WOW_DATA.referencesAvailable===false;
+ return[{t:"Recurring Sales",c:"#10205b",v:[M(cw(r=>r.RecCW)),M(cw(r=>r.RecPW)),M(ref(x=>x.q4New)),M(ref(x=>x.tNew))]},
+ {t:"Cancels",c:"#e0a800",v:[M(cw(r=>r.CanCW)),M(cw(r=>r.CanPW)),M(ref(x=>x.q4Can)),M(ref(x=>x.tCan))]},
+ {t:"Non-Recurring Sales",c:"#2bb0a3",v:[M(cw(r=>r.OTCW)),M(cw(r=>r.OTPW)),M(ref(x=>x.q4OT)),M(ref(x=>x.tOT))]},
+ {t:"Recurring Net New",c:"#e8871e",v:[M(cw(r=>r.RecCW+r.CanCW)),M(cw(r=>r.RecPW+r.CanPW)),M(ref(x=>x.q4New+x.q4Can)),M(ref(x=>x.tNN))]},
+ {t:"Total Net New",c:"#c0396b",v:[M(cw(r=>r.RecCW+r.CanCW+r.OTCW)),M(cw(r=>r.RecPW+r.CanPW+r.OTPW)),M(ref(x=>x.q4New+x.q4Can+x.q4OT)),M(ref(x=>x.tTNN))]}].map(ch=>refsMissing?{...ch,v:[ch.v[0],ch.v[1],NaN,NaN]}:ch);}
+const SL=["Current","Prior","Q3 25","Target"];
+function bar(vals,color){const W=250,H=155,pad=26,bw=40,gap=16;const mn=Math.min(...vals.filter(Number.isFinite),0),mx=Math.max(...vals.filter(Number.isFinite),0),rg=(mx-mn)||1,y0=pad+(H-2*pad)*(mx/rg),op=[1,.62,.82,.38];
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible"><line x1="8" y1="${y0.toFixed(1)}" x2="${W-8}" y2="${y0.toFixed(1)}" stroke="#d0d6e2"/>`;
+ vals.forEach((v,i)=>{const x=18+i*(bw+gap);if(!Number.isFinite(v)){s+=`<text x="${x+bw/2}" y="${H-24}" font-size="10" text-anchor="middle" fill="#6b7280">N/A</text><text x="${x+bw/2}" y="${H-3}" font-size="9" text-anchor="middle" fill="#6b7280">${SL[i]}</text>`;return;}const hh=Math.abs(v)/rg*(H-2*pad),y=v>=0?y0-hh:y0;s+=`<rect x="${x}" y="${y.toFixed(1)}" width="${bw}" height="${Math.max(hh,.5).toFixed(1)}" fill="${color}" opacity="${op[i]}" rx="2"/><text x="${x+bw/2}" y="${(v>=0?y-4:y+hh+12).toFixed(1)}" font-size="10" font-weight="600" text-anchor="middle" fill="#1c2331">${v.toFixed(1)}M</text><text x="${x+bw/2}" y="${H-3}" font-size="9" text-anchor="middle" fill="#6b7280">${SL[i]}</text>`;});
+ return s+`</svg>`;}
+function renderSummary(){document.getElementById("sumCharts").innerHTML=sc().map(function(ch){var dP=ch.v[0]-ch.v[1],dT=ch.v[0]-ch.v[3];var dm=function(x){return Number.isFinite(x)?(x>=0?"+":"\u2212")+"$"+Math.abs(x).toFixed(2)+"M":"N/A";};var cl=function(x){return !Number.isFinite(x)?"":x>=0?"pos":"neg";};return `<div style="background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden">`+`<div style="background:${ch.c};color:#fff;padding:8px 12px;font-weight:700;font-size:13px">${ch.t}</div>`+`<div style="display:flex;justify-content:space-around;gap:6px;padding:5px 8px;font-size:10.5px;background:#f4f6fb;border-bottom:1px solid var(--line)">`+`<span style="color:#55607a">\u0394 vs Prior <b class="${cl(dP)}">${dm(dP)}</b></span>`+`<span style="color:#55607a">\u0394 vs Target <b class="${cl(dT)}">${dm(dT)}</b></span></div>`+`<div style="padding:8px 6px 2px">${bar(ch.v,ch.c)}</div></div>`;}).join("");
+ const mv=l=>l.filter(r=>isSeg(r[1])&&isReg(r[2]));
+ const topN=(l,pos)=>{const f=mv(l).filter(r=>pos?r[3]>0:r[3]<0);f.sort((a,b)=>pos?b[3]-a[3]:a[3]-b[3]);return f.slice(0,5);};
+ const T=[["Recurring Sales — WoW Addition (Top 5)","#10205b",topN(D.MV_REC,1)],["Cancels — WoW Addition (Top 5)","#e0a800",topN(D.MV_CAN,0)],["Non-Recurring — WoW Addition (Top 5)","#2bb0a3",topN(D.MV_OT,1)],["Recurring Sales — WoW Reduction (Bottom 5)","#10205b",topN(D.MV_REC,0)],["Cancels — WoW Reduction (Bottom 5)","#e0a800",topN(D.MV_CAN,1)],["Non-Recurring — WoW Reduction (Bottom 5)","#2bb0a3",topN(D.MV_OT,0)]];
+ document.getElementById("sumTables").innerHTML=T.map(tb=>{const body=tb[2].length?tb[2].map(r=>`<tr><td class="l">${r[0]}</td><td style="text-align:right;color:${r[3]<0?'var(--neg)':'var(--ink)'}">${Math.round(r[3]).toLocaleString()}</td></tr>`).join(""):`<tr><td class="l" colspan="2" style="color:#9aa3b2;font-style:italic;padding:12px">No items</td></tr>`;
+  return `<div style="background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden"><div style="background:${tb[1]};color:#fff;padding:8px 12px;font-weight:700;font-size:12.5px">${tb[0]}</div><table class="mx" style="font-size:11.5px"><thead><tr><th class="l">Account Name</th><th>Amount</th></tr></thead><tbody>${body}</tbody></table></div>`;}).join("");}
+/* ---------- Exec Summary (all cuts, no filters) ---------- */
+function renderExec(){
+ const levels=[["Real Assets","Real Assets"],["Private Capital Solutions","Private Capital Solutions"],["Total PA","ALL"]];
+ const regions=[["Americas","Americas"],["EMEA","EMEA"],["APAC","APAC"],["Global","ALL"]];
+ const mets=[["Rec Sales","#2b46c4",0,0],["Cancels","#e0a800",1,1],["Rec Net New","#e8871e",3,0]];
+ const NC=1+mets.length*regions.length;
+ const f=v=>Number.isFinite(v)?(v<0?"−":"")+Math.abs(v).toFixed(1):"N/A";
+ const pctv=(a,b)=>{if(!Number.isFinite(b))return"N/A";if(!b)return"–";var p=a/b*100;return p<0?"n/m":Math.round(p)+"%";};
+ const heat=(cur,ref,isCan)=>{if(!ref)return"transparent";var p=cur/ref*100;if(p<0)return"transparent";return isCan?(p<=100?"#d5efe0":"#fbe0dc"):(p>=100?"#d5efe0":(p>=95?"#fcefcf":"#fbe0dc"));};
+ let html="";
+ levels.forEach(function(lv){
+  const V={};regions.forEach((rg,ri)=>{const s=scCut(lv[1],rg[1]);mets.forEach(mt=>{V[mt[2]+"_"+ri]=s[mt[2]].v;});});
+  const val=(mi,ri)=>V[mi+"_"+ri];
+  let t=`<div class="panel"><div class="mcap" style="background:#10205b">${lv[0]}</div><table class="mx" style="font-size:11.5px"><thead>`;
+  t+=`<tr><th class="l" rowspan="2" style="vertical-align:bottom">Forecast</th>`+mets.map((mt,mi)=>`<th colspan="4" style="background:${mt[1]};color:#fff;text-align:center${mi>0?';border-left:2px solid #c7cfe0':''}">${mt[0]}</th>`).join("")+`</tr>`;
+  t+=`<tr>`+mets.map((mt,mi)=>regions.map((rg,ri)=>`<th style="text-align:center;font-size:10px${(mi>0&&ri===0)?';border-left:2px solid #c7cfe0':''}">${rg[0]}</th>`).join("")).join("")+`</tr></thead><tbody>`;
+  const sp=`<tr class="sp"><td colspan="${NC}"></td></tr>`;
+  const row=(label,bold,render)=>{let r=`<tr><td class="l"${bold?' style="font-weight:700"':''}>${label}</td>`;mets.forEach((mt,mi)=>regions.forEach((rg,ri)=>{const c=render(val(mt[2],ri),mt[3]);const bl=(mi>0&&ri===0)?'border-left:2px solid #c7cfe0;':'';r+=`<td style="${bl}${c.s||''}">${c.t}</td>`;}));return r+`</tr>`;};
+  t+=row("Current Week",true,v=>({t:f(v[0]),s:'font-weight:700'}));
+  t+=row("Q3'26 Target",false,v=>({t:f(v[3]),s:'color:#55607a'}));
+  t+=sp;
+  t+=row("Vs. Target",true,(v,ic)=>({t:pctv(v[0],v[3]),s:'font-weight:700;background:'+heat(v[0],v[3],ic)}));
+  t+=sp;
+  t+=row("Prior Week",false,v=>({t:f(v[1]),s:'color:#55607a'}));
+  t+=row("Change vs. Prior Week",false,v=>{var d=v[0]-v[1];return{t:(d>=0?'+':'−')+Math.abs(d).toFixed(1),s:'font-weight:600;color:'+(d>=0?'var(--pos)':'var(--neg)')};});
+  t+=sp;
+  t+=row("Q3'25",false,v=>({t:f(v[2]),s:'color:#55607a'}));
+  t+=row("YoY %",true,v=>{var q=v[2];if(!Number.isFinite(q))return{t:"N/A",s:''};if(!q)return{t:"–",s:''};var g=(v[0]-q)/Math.abs(q)*100;return{t:(g>=0?'+':'−')+Math.abs(Math.round(g))+'%',s:'font-weight:700;color:'+(g>=0?'var(--pos)':'var(--neg)')};});
+  t+=`</tbody></table></div>`;html+=t;
+ });
+ document.getElementById("execTables").innerHTML=html;}
+/* ---------- WoW Change ---------- */
+function wowPanel(title,color,list,track){const rows=list.filter(r=>isSeg(r[1])&&isReg(r[2])).slice().sort((a,b)=>b[3]-a[3]);
+ const comp=D.summaryComp.filter(r=>isSeg(r.seg)&&isReg(r.region));const pw=comp.reduce((a,r)=>a+r[track+"PW"],0),cw=comp.reduce((a,r)=>a+r[track+"CW"],0),tot=rows.reduce((a,r)=>a+r[3],0);
+ const body=rows.length?rows.map(r=>`<tr><td class="l">${r[0]}</td><td class="l" style="color:#55607a">${r[4]||''}</td><td style="text-align:right;color:${r[3]<0?'var(--neg)':'var(--pos)'}">${Math.round(r[3]).toLocaleString()}</td></tr>`).join(""):`<tr><td class="l" colspan="3" style="color:#9aa3b2;font-style:italic;padding:12px">No accounts beyond ±$5K</td></tr>`;
+ return `<div style="background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden"><div style="background:${color};color:#fff;padding:8px 12px;display:flex;justify-content:space-between"><span style="font-weight:700;font-size:13px">${title} (Var &gt; 5K, &lt; −5K)</span><span style="font-size:11px;opacity:.9">Prior ${fmtM(pw)} → Current ${fmtM(cw)}</span></div><div style="max-height:430px;overflow:auto"><table class="mx" style="font-size:11.5px"><thead><tr><th class="l">Account Name</th><th class="l">Sales Owner</th><th>Variance</th></tr></thead><tbody>${body}</tbody><tfoot><tr class="tot"><td class="l" colspan="2">Total</td><td style="text-align:right">${Math.round(tot).toLocaleString()}</td></tr></tfoot></table></div></div>`;}
+function renderWow(){document.getElementById("wowRec").innerHTML=wowPanel("Recurring Sales","#10205b",D.MV_REC,"Rec");document.getElementById("wowCan").innerHTML=wowPanel("Cancels","#e0a800",D.MV_CAN,"Can");document.getElementById("wowOT").innerHTML=wowPanel("One-Time","#2bb0a3",D.MV_OT,"OT");}
+/* ---------- Global ---------- */
+function renderGlobal(){const rows=WOW_DATA.global.filter(r=>isSeg(r[1])&&isReg(r[2]));
+ const wk={};WOW_DATA.globalWeeks.forEach(w=>wk[w]={QTD:0,C:0,B:0,O:0,A:0,AO:0,CAM:0});
+ rows.forEach(r=>{const x=wk[r[0]];if(x){x.QTD+=r[3];x.C+=r[4];x.B+=r[5];x.O+=r[6];x.A+=r[7];x.AO+=r[8];x.CAM+=r[9];}});
+ const tgt=D.summaryComp.filter(r=>isSeg(r.seg)&&isReg(r.region)).reduce((a,r)=>a+(REFS[r.seg+"|"+r.region]?REFS[r.seg+"|"+r.region].tNew:0),0);
+ const W=WOW_DATA.globalWeeks, k=v=>v===0?"$0K":"$"+Math.round(v/1000).toLocaleString()+"K";
+ /* Row spec: [label, valueFn, isTotal, isRatio, isSectionHeader, startsNewBlock]
+    Forecast block : QTD Actual + Commit + CAM Placeholder = Total Forecast
+    Gross block    : Commit + Best Case + Omit             = Total Gross Pipeline (open pipeline only, excl. QTD Actual and CAM) */
+ const R=[
+   ["QTD Actual",x=>k(x.QTD)],
+   ["Commit",x=>k(x.C)],
+   ["CAM Placeholder pipeline",x=>k(x.CAM)],
+   ["Total Forecast (Act + Commit + CAM)",x=>k(x.QTD+x.C+x.CAM),1],
+   ["Best Case",x=>k(x.B),0,0,0,1],
+   ["Omit",x=>k(x.O)],
+   ["Total Gross Pipeline (Commit + BC + Omit)",x=>k(x.C+x.B+x.O),1],
+   ["Quarter Target",x=>WOW_DATA.referencesAvailable===false?"N/A":k(tgt),0,0,0,1],
+   ["Pipeline to Target (Act+Commit+BC)",x=>tgt?((x.QTD+x.C+x.B)/tgt).toFixed(1)+"x":"–",0,1,0,1],
+   ["Pipeline to Target (incl Omit)",x=>tgt?((x.QTD+x.C+x.B+x.O)/tgt).toFixed(1)+"x":"–",0,1],
+   ["Best Case ÷ CAM Placeholder (BC→Commit signal)",x=>x.CAM?(x.B/x.CAM).toFixed(1)+"x":"–",0,1],
+   ["Advanced Stage",x=>"",0,0,1,1],
+   ["Adv Stage Pipeline to Target (Act+Commit+BC)",x=>tgt?((x.QTD+x.A)/tgt).toFixed(1)+"x":"–",0,1],
+   ["Adv Stage Pipeline to Target (incl Omit)",x=>tgt?((x.QTD+x.A+x.AO)/tgt).toFixed(1)+"x":"–",0,1]];
+ let h="<thead><tr><th class='l'>Metric</th>"+W.map(w=>`<th>${w}</th>`).join("")+"</tr></thead><tbody>";
+ R.forEach(r=>{const cls=[r[2]?"tot":"",r[5]?"blk":""].filter(Boolean).join(" ");h+=`<tr${cls?` class='${cls}'`:""}${r[4]?" style='background:#eef1fb'":""}>${`<td class='l'${r[4]?" style='font-weight:700;color:#10205b'":""}>${r[0]}</td>`}`+W.map(w=>`<td${r[3]?" style='color:#2b46c4;font-weight:600'":""}>${WOW_DATA.referencesAvailable===false&&r[0].includes("to Target")?"N/A":r[1](wk[w])}</td>`).join("")+"</tr>";});
+ document.getElementById("globalTbl").innerHTML=h+"</tbody>";}
+/* ---------- Global: region-stacked trend charts (Sales, Cancels) ---------- */
+const TREND_REGION_COLOR={Am:"#10205b",Em:"#e0a800",Ap:"#2bb0a3"},TREND_CAM_COLOR="#8a93a6";
+function trendAgg(){
+ // WOW_DATA.global cols (12): week,seg,region, QTD,Commit,BestCase,Omit,AdvStage,AdvStageOmit, CAM, Cancels,CAMCancels
+ const rows=WOW_DATA.global.filter(r=>isSeg(r[1])&&isReg(r[2]));
+ const wk={};WOW_DATA.globalWeeks.forEach(w=>wk[w]={Am:{QTD:0,C:0,CAM:0,CAN:0,CAMCAN:0},Em:{QTD:0,C:0,CAM:0,CAN:0,CAMCAN:0},Ap:{QTD:0,C:0,CAM:0,CAN:0,CAMCAN:0}});
+ rows.forEach(r=>{const w=wk[r[0]];const rg=r[2];if(!w||!w[rg])return;   // blank Finance Region rows have no Am/Em/Ap home; excluded from this regional breakdown
+  const x=w[rg];x.QTD+=r[3];x.C+=r[4];x.CAM+=r[9];x.CAN+=r[10];x.CAMCAN+=r[11];});
+ return wk;
+}
+function trendBars(which){   // which: "sales" | "cancels"
+ const agg=trendAgg(),weeks=WOW_DATA.globalWeeks,lastWk=weeks[weeks.length-1],regions=["Am","Em","Ap"],labels={Am:"Americas",Em:"EMEA",Ap:"APAC"};
+ return weeks.map(w=>{const a=agg[w],isLast=w===lastWk,segs=[];
+  regions.forEach(rg=>{const x=a[rg];
+   const base=which==="sales"?(x.QTD+x.C):x.CAN, camv=which==="sales"?x.CAM:x.CAMCAN;
+   segs.push({label:labels[rg],value:base+camv,color:TREND_REGION_COLOR[rg]});});
+  return{week:w,isLast,segs,total:segs.reduce((s,x)=>s+x.value,0)};});
+}
+function trendFmtM(v){if(v==null||isNaN(v))return"–";const s=v<0?"−":"";const a=Math.abs(v);if(a>=1e6)return s+"$"+(a/1e6).toFixed(1)+"M";if(a>=1e3)return s+"$"+(a/1e3).toFixed(0)+"K";return s+"$"+Math.round(a).toLocaleString();}
+function trendFmtS(v){const s=v>=0?"+":"−";const a=Math.abs(v);if(a>=1e6)return s+"$"+(a/1e6).toFixed(1)+"M";if(a>=1e3)return s+"$"+(a/1e3).toFixed(0)+"K";return s+"$"+Math.round(a);}
+function stackedTrendSVG(bars){
+ const W=Math.max(560,bars.length*78),H=290,padT=40,padB=54,padX=16,n=bars.length,gap=14,bw=Math.max(30,(W-2*padX-(n-1)*gap)/n);
+ const maxAbs=Math.max(1,...bars.map(b=>Math.abs(b.total)));const plotH=H-padT-padB,baseline=padT+plotH;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible"><line x1="${padX}" y1="${baseline}" x2="${W-padX}" y2="${baseline}" stroke="#d0d6e2"/>`;
+ bars.forEach((b,i)=>{const x=padX+i*(bw+gap);let cum=0;
+  b.segs.forEach(seg=>{const h=plotH*(Math.abs(seg.value)/maxAbs),yTop=baseline-cum-h;
+   s+=`<rect x="${x.toFixed(1)}" y="${yTop.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(h,0).toFixed(1)}" fill="${seg.color}" rx="2"/>`;
+   if(seg.value!==0){
+    const cx=(x+bw/2).toFixed(1),cy=(yTop+h/2+3.5).toFixed(1);
+    s+=`<text x="${cx}" y="${cy}" font-size="9" font-weight="700" text-anchor="middle" fill="#fff" paint-order="stroke" stroke="rgba(0,0,0,.4)" stroke-width="2.2" stroke-linejoin="round">${trendFmtM(Math.abs(seg.value))}</text>`;
+   }
+   cum+=h;});
+  s+=`<text x="${(x+bw/2).toFixed(1)}" y="${(baseline-cum-10).toFixed(1)}" font-size="11" font-weight="700" text-anchor="middle" fill="${b.total<0?'#c0392b':'#1c2331'}">${b.total<0?trendFmtS(b.total):trendFmtM(b.total)}</text>`;
+  s+=`<text x="${(x+bw/2).toFixed(1)}" y="${(H-padB+18).toFixed(1)}" font-size="10" font-weight="600" text-anchor="middle" fill="#55607a">${b.week}</text>`;
+  if(b.isLast){
+   s+=`<text x="${(x+bw/2).toFixed(1)}" y="${(H-padB+30).toFixed(1)}" font-size="8.5" font-weight="700" text-anchor="middle" fill="#2b46c4" letter-spacing=".5">CURRENT</text>`;
+   s+=`<rect x="${(x-3).toFixed(1)}" y="${(padT-24).toFixed(1)}" width="${(bw+6).toFixed(1)}" height="${(H-padB-padT+28).toFixed(1)}" fill="none" stroke="#2b46c4" stroke-width="1.6" rx="4"/>`;
+  }});
+ s+="</svg>";
+ const leg=[["Americas",TREND_REGION_COLOR.Am],["EMEA",TREND_REGION_COLOR.Em],["APAC",TREND_REGION_COLOR.Ap]];
+ return s+`<div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap">`+leg.map(([lab,col])=>`<span style="display:flex;align-items:center;gap:5px;font-size:11px;color:#55607a"><span style="width:10px;height:10px;border-radius:2px;background:${col};display:inline-block"></span>${lab}</span>`).join("")+`</div>`;
+}
+function renderTrendCharts(){
+ const se=document.getElementById("salesTrendChart"),ce=document.getElementById("cancelsTrendChart");
+ if(se) se.innerHTML=stackedTrendSVG(trendBars("sales"));
+ if(ce) ce.innerHTML=stackedTrendSVG(trendBars("cancels"));
+}
+/* ---------- wire ---------- */
+function renderAll(){var _p=document.getElementById("pwDate");if(_p)_p.textContent=D.meta.pw;var _c=document.getElementById("cwDate");if(_c)_c.textContent=D.meta.cw;var _n=document.getElementById("ctlNote");if(_n)_n.textContent=D.meta.quarter+" \u00b7 Prior "+D.meta.pw+" \u2192 Current "+D.meta.cw+" \u00b7 computed from the extract files.";renderBlSel();renderLogicRegBtns();renderFCBtns();renderCamNote();renderKpis();renderWaterfall();renderLogicTbl();renderSubProd();renderDrill();renderSummary();renderExec();renderWow();renderGlobal();renderTrendCharts();}
+document.querySelectorAll("#segSeg div").forEach(d=>d.onclick=()=>{document.querySelectorAll("#segSeg div").forEach(x=>x.classList.remove("active"));d.classList.add("active");SEG=d.dataset.s;renderAll();});
+document.getElementById("regSel").onchange=e=>{REG=e.target.value;renderAll();};
+document.querySelectorAll(".pagetab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".pagetab").forEach(x=>x.classList.remove("active"));t.classList.add("active");["exec","summary","global","wow","logic"].forEach(p=>document.getElementById("page-"+p).classList.toggle("hide",p!==t.dataset.p));document.getElementById("regCtl").classList.toggle("hide",t.dataset.p==="logic");document.getElementById("mainControls").classList.toggle("hide",t.dataset.p==="exec");});
+document.getElementById("regCtl").classList.toggle("hide",(document.querySelector(".pagetab.active")||{dataset:{}}).dataset.p==="logic");
+document.getElementById("mainControls").classList.toggle("hide",(document.querySelector(".pagetab.active")||{dataset:{}}).dataset.p==="exec");
+document.getElementById("expBtn").onclick=function(){const L=[];const cr=a=>a.map(function(c){c=(c==null?"":String(c));return /[",\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c;}).join(",");L.push("PA WoW Q3-26 bridge \u2014 Prior "+D.meta.pw+" -> Current "+D.meta.cw);L.push("");var dump=function(name,arr,hdr){L.push("== "+name+" ==");L.push(cr(hdr));arr.forEach(function(r){L.push(cr(r));});L.push("");};dump("L1 Converted",D.C,["Account","Owner","Segment","Region","Forecast (Prior Week)","Prior Qtr","Current Week Qtr","Prior Pipe","Current Week Actual","Impact"]);dump("L2 Disqualified Dropped",D.DR,["Account","Owner","Segment","Region","Forecast","From","MovedTo","PriorPipe","Impact"]);dump("L3 Lost",D.LO,["Account","Owner","Segment","Region","Forecast","Qtr","PriorPipe","Impact"]);dump("L4 Movement",D.MV,["Account","Owner","Segment","Region","Prior Week Forecast","Current Week Forecast","Prior Qtr","Current Week Qtr","PriorPipe","CurrentPipe","Delta"]);dump("L5 New Pipeline",D.NW,["Account","Owner","Segment","Region","Forecast","Qtr","NewPipe"]);dump("L6 Pushed Pulled In",D.PU,["Account","Owner","Segment","Region","Forecast","FromQtr","To","Pipe"]);dump("L7 New Wins",D.NWINS,["Account","Owner","Segment","Region","Forecast","Qtr","Current Week Actual"]);var b=new Blob([L.join("\n")],{type:"text/csv"});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="PA_WoW_computed.csv";a.click();};
+renderAll();
+}
+</script></body></html>
