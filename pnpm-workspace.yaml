@@ -43,6 +43,8 @@ onlyBuiltDependencies:
   - unrs-resolver
 
 overrides:
+  # Typography's latest release pins v6; v7.1.6 fixes GHSA-rj75-hqrm-r3gf.
+  '@tailwindcss/typography>postcss-selector-parser': 7.1.6
   '@esbuild-kit/esm-loader': npm:tsx@^4.21.0
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-arm64': '-'
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-x64': '-'
