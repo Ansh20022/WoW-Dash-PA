@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Private Assets · WoW"
+description = "Invitation-only Private Assets finance dashboard preserving supplied analysis, refreshed from SharePoint weekly extracts with validation."
+version = "1.0.0"
+id = "artifacts/pa-wow"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19494
+
+[services.development]
+run = "pnpm --filter @workspace/pa-wow run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/pa-wow", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/pa-wow/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19494"
+BASE_PATH = "/"

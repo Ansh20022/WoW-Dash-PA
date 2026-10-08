@@ -1,0 +1,1 @@
+- [Dashboard scope and access](dashboard-scope.md) — preserve supplied PA WoW logic; access is invitation-only.
