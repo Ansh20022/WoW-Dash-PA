@@ -1,52 +1,52 @@
 PA WoW - BUILD VALIDATION REPORT
-Generated: 2026-09-25 11:57
-Current week (fixed): 25 Sep 2026  |  Quarter: Q3-26
+Generated: 2026-10-08 10:37
+Current week (fixed): 05 Oct 2026  |  Quarter: Q3-26
 Checks run per baseline: (A) waterfall bridge reconciles per segment/region, (B) Opening & Closing match an INDEPENDENT raw Q3 recompute from the CSVs (total + per segment), (C) every detail table total = its waterfall bar, (D) sign sanity (out-flows<=0, in-flows>=0).
 
 ==================================================================
-BASELINE: Prior week   (Prior 18 Sep 2026  ->  Current 25 Sep 2026)
+BASELINE: Prior week   (Prior 02 Oct 2026  ->  Current 05 Oct 2026)
   RESULT: PASS - all checks OK
-  Opening pipeline : $25.607M   (raw Q3 from file: $25.607M)
-    - L1 Converted to Actual   : $-0.635M
-    - L2 Dropped (shifted out) : $-3.101M
-    - L3 Lost                  : $-1.300M
-    - L4 Movement              : $-1.580M
-    - L5 New Pipeline          : $1.957M
-    - L6 Pushed / Brought fwd  : $0.177M
-  Closing pipeline : $21.125M   (raw Q3 from file: $21.125M)
-  L7 New Wins (separate)       : $0.146M
-  Bridge (Opening + L1..L6 = Closing): OK, residual $-4
-
-==================================================================
-BASELINE: Prior month   (Prior 28 Aug 2026  ->  Current 25 Sep 2026)
-  RESULT: PASS - all checks OK
-  Opening pipeline : $38.667M   (raw Q3 from file: $38.667M)
-    - L1 Converted to Actual   : $-1.993M
-    - L2 Dropped (shifted out) : $-10.320M
-    - L3 Lost                  : $-7.101M
-    - L4 Movement              : $-5.291M
-    - L5 New Pipeline          : $6.961M
-    - L6 Pushed / Brought fwd  : $0.201M
-  Closing pipeline : $21.125M   (raw Q3 from file: $21.125M)
-  L7 New Wins (separate)       : $0.702M
+  Opening pipeline : $8.939M    (raw Q3 from file: $8.939M)
+    - L1 Converted to Actual   : $-3.518M
+    - L2 Dropped (shifted out) : $-0.644M
+    - L3 Lost                  : $-0.360M
+    - L4 Movement              : $0.000M
+    - L5 New Pipeline          : $0.030M
+    - L6 Pushed / Brought fwd  : $0.000M
+  Closing pipeline : $4.447M    (raw Q3 from file: $4.447M)
+  L7 New Wins (separate)       : $0.550M
   Bridge (Opening + L1..L6 = Closing): OK, residual $-1
 
 ==================================================================
-BASELINE: Quarter start   (Prior 07 Jul 2026  ->  Current 25 Sep 2026)
+BASELINE: Prior month   (Prior 04 Sep 2026  ->  Current 05 Oct 2026)
   RESULT: PASS - all checks OK
-  Opening pipeline : $48.210M   (raw Q3 from file: $48.210M)
-    - L1 Converted to Actual   : $-2.769M
-    - L2 Dropped (shifted out) : $-15.276M
-    - L3 Lost                  : $-18.950M
-    - L4 Movement              : $-3.184M
-    - L5 New Pipeline          : $12.391M
-    - L6 Pushed / Brought fwd  : $0.704M
-  Closing pipeline : $21.125M   (raw Q3 from file: $21.125M)
-  L7 New Wins (separate)       : $2.807M
-  Bridge (Opening + L1..L6 = Closing): OK, residual $1
+  Opening pipeline : $34.672M   (raw Q3 from file: $34.672M)
+    - L1 Converted to Actual   : $-4.153M
+    - L2 Dropped (shifted out) : $-13.952M
+    - L3 Lost                  : $-12.435M
+    - L4 Movement              : $-0.100M
+    - L5 New Pipeline          : $0.414M
+    - L6 Pushed / Brought fwd  : $0.001M
+  Closing pipeline : $4.447M    (raw Q3 from file: $4.447M)
+  L7 New Wins (separate)       : $5.837M
+  Bridge (Opening + L1..L6 = Closing): OK, residual $-2
 
 ==================================================================
-GLOBAL PAGE: Sales & Cancels trend charts vs independent raw Q3 recompute, all 13 weekly columns
+BASELINE: Quarter start   (Prior 07 Jul 2026  ->  Current 05 Oct 2026)
+  RESULT: PASS - all checks OK
+  Opening pipeline : $48.210M   (raw Q3 from file: $48.210M)
+    - L1 Converted to Actual   : $-3.745M
+    - L2 Dropped (shifted out) : $-17.107M
+    - L3 Lost                  : $-24.579M
+    - L4 Movement              : $-0.077M
+    - L5 New Pipeline          : $1.647M
+    - L6 Pushed / Brought fwd  : $0.096M
+  Closing pipeline : $4.447M    (raw Q3 from file: $4.447M)
+  L7 New Wins (separate)       : $9.071M
+  Bridge (Opening + L1..L6 = Closing): OK, residual $6
+
+==================================================================
+GLOBAL PAGE: Sales & Cancels trend charts vs independent raw Q3 recompute, all 15 weekly columns
   RESULT: PASS - all checks OK
 
 ==================================================================
