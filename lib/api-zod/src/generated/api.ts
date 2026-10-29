@@ -54,7 +54,7 @@ export const GetDashboardStatusResponse = zod.object({
   "warnings": zod.array(zod.string()),
   "files": zod.array(zod.object({
   "name": zod.string(),
-  "size": zod.number().int()
+  "size": zod.int()
 })),
   "version": zod.string(),
   "refreshing": zod.boolean()
@@ -72,7 +72,7 @@ export const RefreshDashboardResponse = zod.object({
   "warnings": zod.array(zod.string()),
   "files": zod.array(zod.object({
   "name": zod.string(),
-  "size": zod.number().int()
+  "size": zod.int()
 })),
   "version": zod.string(),
   "refreshing": zod.boolean()
